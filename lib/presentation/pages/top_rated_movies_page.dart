@@ -18,9 +18,10 @@ class _TopRatedMoviesPageState extends State<TopRatedMoviesPage> {
   void initState() {
     super.initState();
     Future.microtask(
-        () => context.read<TopRatedMoviesBloc>().add(fetchTopRatedMovies())
-        // Provider.of<TopRatedMoviesNotifier>(context, listen: false)
-        //     .fetchTopRatedMovies()
+        () => 
+        // context.read<TopRatedMoviesBloc>().add(fetchTopRatedMovies())
+        Provider.of<TopRatedMoviesNotifier>(context, listen: false)
+            .fetchTopRatedMovies()
         );
   }
 
@@ -32,56 +33,57 @@ class _TopRatedMoviesPageState extends State<TopRatedMoviesPage> {
       ),
       body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: BlocBuilder<TopRatedMoviesBloc, TopRatedMoviesState>(
-            builder: (context, state) {
-              if (state is TopRatedMoviesLoading) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is TopRatedMoviesHasData) {
-                final result = state.result;
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final movie = result[index];
-                    return MovieCard(movie);
-                  },
-                  itemCount: result.length,
-                );
-              } else if (state is TopRatedMoviesError) {
-                return Expanded(
-                  child: Center(
-                    child: Text(state.message),
-                  ),
-                );
-              } else {
-                return Expanded(
-                  child: Container(),
-                );
-              }
-            },
-          )
-          // Consumer<TopRatedMoviesNotifier>(
-          //   builder: (context, data, child) {
-          //     if (data.state == RequestState.Loading) {
+          child: 
+          // BlocBuilder<TopRatedMoviesBloc, TopRatedMoviesState>(
+          //   builder: (context, state) {
+          //     if (state is TopRatedMoviesLoading) {
           //       return Center(
           //         child: CircularProgressIndicator(),
           //       );
-          //     } else if (data.state == RequestState.Loaded) {
+          //     } else if (state is TopRatedMoviesHasData) {
+          //       final result = state.result;
           //       return ListView.builder(
           //         itemBuilder: (context, index) {
-          //           final movie = data.movies[index];
+          //           final movie = result[index];
           //           return MovieCard(movie);
           //         },
-          //         itemCount: data.movies.length,
+          //         itemCount: result.length,
+          //       );
+          //     } else if (state is TopRatedMoviesError) {
+          //       return Expanded(
+          //         child: Center(
+          //           child: Text(state.message),
+          //         ),
           //       );
           //     } else {
-          //       return Center(
-          //         key: Key('error_message'),
-          //         child: Text(data.message),
+          //       return Expanded(
+          //         child: Container(),
           //       );
           //     }
           //   },
-          // ),
+          // )
+          Consumer<TopRatedMoviesNotifier>(
+            builder: (context, data, child) {
+              if (data.state == RequestState.Loading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (data.state == RequestState.Loaded) {
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    final movie = data.movies[index];
+                    return MovieCard(movie);
+                  },
+                  itemCount: data.movies.length,
+                );
+              } else {
+                return Center(
+                  key: Key('error_message'),
+                  child: Text(data.message),
+                );
+              }
+            },
+          ),
           ),
     );
   }
