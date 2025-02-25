@@ -3,9 +3,11 @@ import 'package:ditonton/common/utils.dart';
 import 'package:ditonton/presentation/bloc/moviedetail/movie_detail_bloc.dart';
 import 'package:ditonton/presentation/bloc/movielist/movielist_bloc.dart';
 import 'package:ditonton/presentation/bloc/popularmovies/popular_movies_bloc.dart';
+import 'package:ditonton/presentation/bloc/populartv/populartv_bloc.dart';
 import 'package:ditonton/presentation/bloc/searchmovies/search_bloc.dart';
 import 'package:ditonton/presentation/bloc/searchtv/search_tv_bloc.dart';
 import 'package:ditonton/presentation/bloc/topratedmovies/top_rated_movies_bloc.dart';
+import 'package:ditonton/presentation/bloc/topratedtv/top_rated_tv_bloc.dart';
 import 'package:ditonton/presentation/pages/about_page.dart';
 import 'package:ditonton/presentation/pages/home_tv_page.dart';
 import 'package:ditonton/presentation/pages/movie_detail_page.dart';
@@ -97,6 +99,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => di.locator<MovielistBloc>(),
         ),
+        BlocProvider(
+          create: (_) => di.locator<PopulartvBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => di.locator<TopRatedTvBloc>(),
+        )
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
