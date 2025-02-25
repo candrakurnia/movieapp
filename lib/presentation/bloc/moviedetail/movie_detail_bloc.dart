@@ -9,6 +9,9 @@ import 'package:ditonton/presentation/bloc/moviedetail/movie_detail_event.dart';
 import 'package:ditonton/presentation/bloc/moviedetail/movie_detail_state.dart';
 
 class MovieDetailBloc extends Bloc<MovieDetailEvent, MovieDetailState> {
+  static const watchlistAddSuccessMessage = 'Added to Watchlist';
+  static const watchlistRemoveSuccessMessage = 'Removed from Watchlist';
+
   final GetMovieDetail getMovieDetail;
   final GetMovieRecommendations getMovieRecommendations;
   final GetWatchListStatus getWatchListStatus;
@@ -23,11 +26,10 @@ class MovieDetailBloc extends Bloc<MovieDetailEvent, MovieDetailState> {
     required this.removeWatchlist,
   }) : super(MovieDetailInitial()) {
     on<FetchMovieDetailEvent>((event, emit) async {
+      emit(MovieDetailLoading());
       final detailResult = await getMovieDetail.execute(event.id);
       final recommendationResult =
           await getMovieRecommendations.execute(event.id);
-      emit(MovieDetailLoading());
-
       await detailResult.fold(
         (failure) async {
           emit(MovieDetailError(failure.message));
@@ -58,11 +60,18 @@ class MovieDetailBloc extends Bloc<MovieDetailEvent, MovieDetailState> {
           emit(WatchlistMessageState(failure.message));
         },
         (successMessage) async {
-          emit(WatchlistMessageState(successMessage));
-
           final isAddedToWatchlist =
               await getWatchListStatus.execute(event.movie.id);
-          emit(WatchlistStatusLoaded(isAddedToWatchlist));
+
+          final currentState = state;
+          if (currentState is MovieDetailLoaded) {
+            emit(WatchlistMessageState(successMessage));
+            emit(MovieDetailLoaded(
+              movie: currentState.movie,
+              recommendations: currentState.recommendations,
+              isAddedToWatchlist: isAddedToWatchlist,
+            ));
+          }
         },
       );
     });
@@ -75,19 +84,25 @@ class MovieDetailBloc extends Bloc<MovieDetailEvent, MovieDetailState> {
           emit(WatchlistMessageState(failure.message));
         },
         (successMessage) async {
-          emit(WatchlistMessageState(successMessage));
-
           final isAddedToWatchlist =
               await getWatchListStatus.execute(event.movie.id);
-          emit(WatchlistStatusLoaded(isAddedToWatchlist));
+
+          final currentState = state;
+          if (currentState is MovieDetailLoaded) {
+            emit(WatchlistMessageState(successMessage));
+            emit(MovieDetailLoaded(
+              movie: currentState.movie,
+              recommendations: currentState.recommendations,
+              isAddedToWatchlist: isAddedToWatchlist,
+            ));
+          }
         },
       );
     });
-
-    on<LoadWatchlistStatusEvent>((event, emit) async {
-      final isAddedToWatchlist = await getWatchListStatus.execute(event.id);
-      emit(MovieDetailLoading());
-      emit(WatchlistStatusLoaded(isAddedToWatchlist));
-    });
+    // on<LoadWatchlistStatusEvent>((event, emit) async {
+    //   final isAddedToWatchlist = await getWatchListStatus.execute(event.id);
+    //   emit(MovieDetailLoading());
+    //   emit(WatchlistStatusLoaded(isAddedToWatchlist));
+    // });
   }
 }
