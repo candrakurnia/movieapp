@@ -27,6 +27,7 @@ import 'package:ditonton/presentation/bloc/searchtv/search_tv_bloc.dart';
 import 'package:ditonton/presentation/bloc/topratedmovies/top_rated_movies_bloc.dart';
 import 'package:ditonton/presentation/bloc/topratedtv/top_rated_tv_bloc.dart';
 import 'package:ditonton/presentation/bloc/tvdetail/tv_detail_bloc.dart';
+import 'package:ditonton/presentation/bloc/tvlist/tv_list_bloc.dart';
 import 'package:ditonton/presentation/provider/movie_detail_notifier.dart';
 import 'package:ditonton/presentation/provider/movie_list_notifier.dart';
 import 'package:ditonton/presentation/provider/movie_search_notifier.dart';
@@ -86,6 +87,13 @@ void init() {
         getNowPlayingMovies: locator(),
         getTopRatedMovies: locator(),
         getPopularMovies: locator()),
+  );
+  locator.registerFactory(
+    () => TvListBloc(
+      locator(),
+      locator(),
+      locator(),
+    ),
   );
   locator.registerFactory(
     () => PopulartvBloc(
