@@ -40,12 +40,14 @@ import 'package:ditonton/presentation/provider/tv_detail_notifier.dart';
 import 'package:ditonton/presentation/provider/tv_list_notifier.dart';
 import 'package:ditonton/presentation/provider/tv_search_notifier.dart';
 import 'package:ditonton/presentation/provider/watchlist_movie_notifier.dart';
+import 'package:ditonton/common/http_client_factory.dart';
+import 'package:ditonton/common/pinning_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_it/get_it.dart';
 
 final locator = GetIt.instance;
 
-void init() {
+Future<void> init() async {
   locator.registerFactory(
     () => SearchBloc(
       locator(),
@@ -214,5 +216,10 @@ void init() {
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
 
   // external
-  locator.registerLazySingleton(() => http.Client());
+  final client = await HttpClientFactory.create(
+    const CertificatePinningConfig(
+      assetPath: 'certificates/certificates.crt',
+    ),
+  );
+  locator.registerLazySingleton<http.Client>(() => client);
 }
