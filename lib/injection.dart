@@ -21,9 +21,13 @@ import 'package:ditonton/domain/usecases/search_tv.dart';
 import 'package:ditonton/presentation/bloc/moviedetail/movie_detail_bloc.dart';
 import 'package:ditonton/presentation/bloc/movielist/movielist_bloc.dart';
 import 'package:ditonton/presentation/bloc/popularmovies/popular_movies_bloc.dart';
+import 'package:ditonton/presentation/bloc/populartv/populartv_bloc.dart';
 import 'package:ditonton/presentation/bloc/searchmovies/search_bloc.dart';
 import 'package:ditonton/presentation/bloc/searchtv/search_tv_bloc.dart';
 import 'package:ditonton/presentation/bloc/topratedmovies/top_rated_movies_bloc.dart';
+import 'package:ditonton/presentation/bloc/topratedtv/top_rated_tv_bloc.dart';
+import 'package:ditonton/presentation/bloc/tvdetail/tv_detail_bloc.dart';
+import 'package:ditonton/presentation/bloc/tvlist/tv_list_bloc.dart';
 import 'package:ditonton/presentation/provider/movie_detail_notifier.dart';
 import 'package:ditonton/presentation/provider/movie_list_notifier.dart';
 import 'package:ditonton/presentation/provider/movie_search_notifier.dart';
@@ -36,12 +40,14 @@ import 'package:ditonton/presentation/provider/tv_detail_notifier.dart';
 import 'package:ditonton/presentation/provider/tv_list_notifier.dart';
 import 'package:ditonton/presentation/provider/tv_search_notifier.dart';
 import 'package:ditonton/presentation/provider/watchlist_movie_notifier.dart';
+import 'package:ditonton/common/http_client_factory.dart';
+import 'package:ditonton/common/pinning_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_it/get_it.dart';
 
 final locator = GetIt.instance;
 
-void init() {
+Future<void> init() async {
   locator.registerFactory(
     () => SearchBloc(
       locator(),
@@ -63,6 +69,14 @@ void init() {
     ),
   );
   locator.registerFactory(
+    () => TvDetailBloc(
+        getTvDetail: locator(),
+        getTvRecommendations: locator(),
+        getWatchListStatus: locator(),
+        saveWatchlist: locator(),
+        removeWatchlist: locator()),
+  );
+  locator.registerFactory(
     () => MovieDetailBloc(
         getMovieDetail: locator(),
         getMovieRecommendations: locator(),
@@ -72,9 +86,25 @@ void init() {
   );
   locator.registerFactory(
     () => MovielistBloc(
-      getNowPlayingMovies: locator(),
-      getTopRatedMovies: locator(),
-      getPopularMovies: locator()
+        getNowPlayingMovies: locator(),
+        getTopRatedMovies: locator(),
+        getPopularMovies: locator()),
+  );
+  locator.registerFactory(
+    () => TvListBloc(
+      locator(),
+      locator(),
+      locator(),
+    ),
+  );
+  locator.registerFactory(
+    () => PopulartvBloc(
+      locator(),
+    ),
+  );
+  locator.registerFactory(
+    () => TopRatedTvBloc(
+      locator(),
     ),
   );
   // provider
@@ -186,5 +216,10 @@ void init() {
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
 
   // external
-  locator.registerLazySingleton(() => http.Client());
+  final client = await HttpClientFactory.create(
+    const CertificatePinningConfig(
+      assetPath: 'certificates/certificates.crt',
+    ),
+  );
+  locator.registerLazySingleton<http.Client>(() => client);
 }

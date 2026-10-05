@@ -10,7 +10,7 @@ class TopRatedMoviesBloc extends Bloc<TopRatedMoviesEvent, TopRatedMoviesState> 
   final GetTopRatedMovies _getTopRatedMovies;
   TopRatedMoviesBloc(this._getTopRatedMovies) : super(TopRatedMoviesEmpty()) {
     on<fetchTopRatedMovies>((event, emit) async {
-
+      emit(TopRatedMoviesLoading());
        final result = await _getTopRatedMovies.execute();
       result.fold(
         (failure) {

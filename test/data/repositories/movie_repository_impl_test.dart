@@ -490,6 +490,22 @@ void main() {
       expect(result,
           equals(Left(ConnectionFailure('Failed to connect to the network'))));
     });
+
+    test(
+        'should return ConnectionFailure when HandshakeException is thrown',
+        () async {
+      // arrange
+      when(mockRemoteDataSource.getNowPlayingMovies())
+          .thenThrow(const HandshakeException('CERTIFICATE_VERIFY_FAILED'));
+      // act
+      final result = await repository.getNowPlayingMovies();
+      // assert
+      verify(mockRemoteDataSource.getNowPlayingMovies());
+      expect(
+          result,
+          equals(Left(ConnectionFailure(
+              'Failed to verify server certificate'))));
+    });
   });
 
   group('Popular Movies', () {

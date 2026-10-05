@@ -1,10 +1,7 @@
-import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/presentation/bloc/popularmovies/popular_movies_bloc.dart';
-import 'package:ditonton/presentation/provider/popular_movies_notifier.dart';
 import 'package:ditonton/presentation/widgets/movie_card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 class PopularMoviesPage extends StatefulWidget {
   static const ROUTE_NAME = '/popular-movie';
@@ -17,12 +14,11 @@ class _PopularMoviesPageState extends State<PopularMoviesPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => 
-        // context.read<PopularMoviesBloc>().add(FetchPopularMoviesEvent())
-        Provider.of<PopularMoviesNotifier>(context, listen: false)
-            .fetchPopularMovies()
-        );
+    Future.microtask(() =>
+        context.read<PopularMoviesBloc>().add(FetchPopularMoviesEvent())
+        // Provider.of<PopularMoviesNotifier>(context, listen: false)
+        //     .fetchPopularMovies()
+            );
   }
 
   @override
@@ -33,57 +29,52 @@ class _PopularMoviesPageState extends State<PopularMoviesPage> {
       ),
       body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child:
-          //  BlocBuilder<PopularMoviesBloc, PopularMoviesState>(
-          //   builder: (context, state) {
-          //     if (state is PopularMoviesLoading) {
-          //       return Center(
-          //         child: CircularProgressIndicator(),
-          //       );
-          //     } else if (state is PopularMoviesHasData) {
-          //       final result = state.result;
-          //       return ListView.builder(
-          //         itemBuilder: (context, index) {
-          //           final movie = result[index];
-          //           return MovieCard(movie);
-          //         },
-          //         itemCount: result.length,
-          //       );
-          //     } else if (state is PopularMoviesError) {
-          //       return Expanded(
-          //         child: Center(
-          //           child: Text(state.message),
-          //         ),
-          //       );
-          //     } else {
-          //       return Expanded(
-          //         child: Container(),
-          //       );
-          //     }
-          //   },
-          // )
-          Consumer<PopularMoviesNotifier>(
-            builder: (context, data, child) {
-              if (data.state == RequestState.Loading) {
+          child: BlocBuilder<PopularMoviesBloc, PopularMoviesState>(
+            builder: (context, state) {
+              if (state is PopularMoviesLoading) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (data.state == RequestState.Loaded) {
-          return ListView.builder(
-            itemBuilder: (context, index) {
-              final movie = data.movies[index];
-              return MovieCard(movie);
-            },
-            itemCount: data.movies.length,
-          );
-              } else {
-                return Center(
-                  key: Key('error_message'),
-                  child: Text(data.message),
+              } else if (state is PopularMoviesHasData) {
+                final result = state.result;
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    final movie = result[index];
+                    return MovieCard(movie);
+                  },
+                  itemCount: result.length,
                 );
+              } else if (state is PopularMoviesError) {
+                return Center(
+                  child: Text(state.message),
+                );
+              } else {
+                return Container();
               }
             },
-          ),
+          )
+          // Consumer<PopularMoviesNotifier>(
+          //   builder: (context, data, child) {
+          //     if (data.state == RequestState.Loading) {
+          //       return Center(
+          //         child: CircularProgressIndicator(),
+          //       );
+          //     } else if (data.state == RequestState.Loaded) {
+          // return ListView.builder(
+          //   itemBuilder: (context, index) {
+          //     final movie = data.movies[index];
+          //     return MovieCard(movie);
+          //   },
+          //   itemCount: data.movies.length,
+          // );
+          //     } else {
+          //       return Center(
+          //         key: Key('error_message'),
+          //         child: Text(data.message),
+          //       );
+          //     }
+          //   },
+          // ),
           ),
     );
   }
